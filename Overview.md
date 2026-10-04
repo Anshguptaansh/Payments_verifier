@@ -1,69 +1,77 @@
 # Live Payment Dashboard
 
-## Overview
+A full-stack payment simulation that demonstrates how REST APIs, webhooks, HMAC signature verification, and WebSockets work together in a real-world payment flow.
 
-Live Payment Dashboard is a full-stack payment simulation built to demonstrate how REST APIs, webhooks, HMAC verification, and WebSockets work together in a real application.
+---
 
-A customer starts a payment from the React frontend. The Node.js backend creates the payment and sends it to a simulated payment provider. After a short processing delay, the provider sends a signed webhook back to the backend. The backend verifies the signature, updates the payment record, and broadcasts the result to an admin dashboard over a persistent WebSocket connection.
+## What This Project Does
 
-The result is a live operational view where payment activity appears without refreshing the page.
+A customer submits a payment from the frontend. The backend creates the payment record and hands it off to a simulated payment provider. After a short processing delay, the provider sends a signed webhook back to the backend. The backend verifies the signature, updates the payment status, and instantly pushes the result to an admin dashboard — no page refresh needed.
 
-## Key Features
+---
 
-- Customer payment page with amount, payment initiation, and clear status feedback.
-- Simulated payment provider that produces successful or failed payment outcomes.
-- REST API for creating payments and retrieving payment data.
-- Webhook endpoint for receiving provider events such as `payment.processing`, `payment.captured`, and `payment.failed`.
-- HMAC-SHA256 signature generation and verification using a shared webhook secret.
-- SQLite-backed payment records for persistent local development data.
-- WebSocket server that broadcasts payment events to connected admin clients.
-- Admin dashboard with live payment ID, amount, status, event type, and timestamp updates.
-- Separate frontend routes for the customer and admin experiences.
-- Health-check endpoint for monitoring backend availability.
+## How the Flow Works
 
-## Architecture
-
-```text
-Customer UI
-    |
-    | REST request
-    v
-Node.js / Express API ----> Fake Payment Provider
-    ^                              |
-    |                              | Signed webhook
-    +------------------------------+
-    |
-    | Verify, persist, broadcast
-    v
-WebSocket Server ----> Admin Dashboard
+```
+Customer UI  →  REST API  →  Node.js Backend  →  Fake Payment Provider
+                                    ↑                       |
+                                    |   Signed webhook       |
+                                    +───────────────────────+
+                                    |
+                              Verify + Persist
+                                    |
+                              WebSocket broadcast
+                                    |
+                               Admin Dashboard
 ```
 
-## Payment Flow
+1. Customer fills in a product name and amount, then clicks **Pay**
+2. The frontend sends a POST request to the backend
+3. The backend creates the payment and forwards it to the fake payment provider
+4. The provider simulates processing and fires a signed webhook back
+5. The backend verifies the HMAC-SHA256 signature to confirm the webhook is authentic
+6. The payment record is updated in the database
+7. The backend broadcasts the update over WebSocket
+8. The admin dashboard reflects the new status in real time
 
-1. The customer clicks **Pay**.
-2. The frontend sends a REST request to the backend.
-3. The backend creates a payment and forwards it to the fake provider.
-4. The provider simulates processing and sends a signed webhook.
-5. The backend verifies the HMAC signature before accepting the event.
-6. The payment status is updated in SQLite.
-7. The backend broadcasts the event through WebSocket.
-8. The admin dashboard updates instantly without a page refresh.
+---
 
-## Technology Stack
+## Tech Stack
 
-- **Frontend:** React, React Router, JavaScript, CSS
-- **Backend:** Node.js, Express.js
-- **Real-time communication:** WebSocket via `ws`
-- **Storage:** SQLite using Node.js's built-in SQLite support
-- **Security concept demonstrated:** HMAC-SHA256 webhook verification
+| Layer | Technology |
+|---|---|
+| Frontend | React, React Router, Vite |
+| Backend | Node.js, Express.js |
+| Real-time | WebSocket (`ws` library) |
+| Database | SQLite (Node.js built-in `node:sqlite`) |
+| Security | HMAC-SHA256 webhook signature verification |
 
-## What This Project Demonstrates
+---
 
-This project shows the difference between request-response communication and event-driven communication:
+## Key Concepts Demonstrated
 
-- **REST:** The frontend asks the backend to create a payment.
-- **Webhook:** An external provider notifies the backend that payment processing has completed.
-- **WebSocket:** The backend pushes the latest payment event to the admin browser.
-- **HMAC:** The backend confirms that webhook payloads were signed with the expected shared secret.
+- **REST** — request/response communication between the frontend and backend
+- **Webhooks** — event-driven notifications from an external provider to the backend
+- **HMAC verification** — ensures webhook payloads haven't been tampered with
+- **WebSockets** — persistent connection that pushes live updates to the browser
 
-It is intentionally a learning-focused simulation rather than a production payment system. No real money, payment gateway, authentication, or third-party payment SDK is involved.
+---
+
+## Features
+
+- Customer payment page with product name, amount input, and live status feedback
+- Simulated payment provider that produces successful or failed outcomes
+- REST API for creating payments and fetching payment records
+- Webhook endpoint that receives provider events — `payment.processing`, `payment.captured`, `payment.failed`
+- HMAC-SHA256 signature verification to authenticate incoming webhooks
+- SQLite-backed payment records that persist across server restarts
+- WebSocket server that broadcasts payment events to all connected admin clients
+- Admin dashboard with live payment ID, amount, status, event type, and timestamp — updates without a page refresh
+- Health-check endpoint for monitoring backend availability
+
+---
+
+## Deployment
+
+- **Frontend** — deployed on [Vercel](https://vercel.com)
+- **Backend** — deployed on [Railway](https://railway.app)

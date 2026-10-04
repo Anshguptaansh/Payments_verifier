@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import StatusBadge from '../components/StatusBadge';
 
-const API_URL = 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 export default function CustomerPage() {
   const [product, setProduct] = useState('');
