@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "start": "node --experimental-sqlite index.js",
     "dev": "node --experimental-sqlite index.js",
     "db": "node --experimental-sqlite db-viewer.js"
   },
