@@ -1,0 +1,57 @@
+﻿/* ============================================
+   index.css — Global Styles & Design System
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  /* Colors */
+  --bg-primary: #0f1117;
+  --bg-secondary: #1a1d27;
+  --bg-card: #1e2130;
+  --bg-card-hover: #252840;
+  --border-color: #2a2d3e;
+  --border-accent: #3b3f54;
+
+  --text-primary: #e8e9ed;
+  --text-secondary: #9ca0b0;
+  --text-muted: #6b7085;
+
+  --accent-blue: #5b7fff;
+  --accent-purple: #9b6dff;
+  --accent-green: #34d399;
+  --accent-red: #f87171;
+  --accent-yellow: #fbbf24;
+  --accent-orange: #fb923c;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  --gradient-success: linear-gradient(135deg, #34d399, #06b6d4);
+  --gradient-danger: linear-gradient(135deg, #f87171, #fb923c);
+
+  /* Spacing */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Font */
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, .payment-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
