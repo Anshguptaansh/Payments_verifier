@@ -43,10 +43,17 @@ router.post('/', (req, res) => {
   const { amount, product } = req.body;
 
   // Validate input
-  if (!amount || !product) {
+  if (!product || typeof product !== 'string' || !product.trim()) {
     return res.status(400).json({
       success: false,
       error: 'Both "amount" and "product" are required.'
+    });
+  }
+
+  if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
+    return res.status(400).json({
+      success: false,
+      error: '"amount" must be a positive number.'
     });
   }
 

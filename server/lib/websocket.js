@@ -21,14 +21,21 @@
 //
 // HOW IT WORKS:
 //   1. WebSocket server attaches to the same HTTP server as Express
-//   2. Admin dashboard connects via ws://localhost:3001
+//   2. Admin dashboard connects via wss://<your-render-url> in production
+//      or ws://localhost:3001 in local development
 //   3. When broadcast() is called, it loops through ALL connected
 //      clients and sends them the data
+//   4. A ping/pong heartbeat keeps connections alive — cloud providers
+//      (Render, Railway, etc.) drop idle WebSocket connections after ~60s
 // ============================================================
 
 import { WebSocketServer } from 'ws';
 
 let wss = null;
+
+// Allowed origins for WebSocket connections.
+// Reads from ALLOWED_ORIGIN env var (same as CORS) with localhost fallback.
+const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:5173';
 
 /**
  * Initialize the WebSocket server.
@@ -37,9 +44,42 @@ let wss = null;
  * @param {http.Server} server - The HTTP server instance
  */
 export function initWebSocket(server) {
-  wss = new WebSocketServer({ server });
+  wss = new WebSocketServer({
+    server,
+    // Validate the origin of incoming WebSocket upgrade requests.
+    // This prevents any random website from connecting and receiving live payment data.
+    verifyClient: ({ origin }) => {
+      // Allow connections with no origin header (e.g. server-to-server, curl, Postman)
+      if (!origin) return true;
+      const allowed = origin === allowedOrigin;
+      if (!allowed) {
+        console.warn(`[WebSocket] Rejected connection from disallowed origin: ${origin}`);
+      }
+      return allowed;
+    }
+  });
+
+  // ---- Ping/Pong Heartbeat ----
+  // Cloud platforms drop idle WebSocket connections after ~30-60 seconds.
+  // We ping every 25 seconds so the connection stays alive.
+  // If a client doesn't respond to a ping, it's terminated and cleaned up.
+  const heartbeat = setInterval(() => {
+    wss.clients.forEach((ws) => {
+      if (ws.isAlive === false) {
+        console.log('[WebSocket] Terminating unresponsive client.');
+        return ws.terminate();
+      }
+      ws.isAlive = false;
+      ws.ping();
+    });
+  }, 25000);
+
+  wss.on('close', () => clearInterval(heartbeat));
 
   wss.on('connection', (ws, req) => {
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; }); // Client responded to ping
+
     console.log(`[WebSocket] New client connected. Total clients: ${wss.clients.size}`);
 
     // Send a welcome message to the newly connected client

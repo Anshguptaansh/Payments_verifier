@@ -41,8 +41,8 @@ import { generateSignature } from './hmac.js';
  * @param {number} amount - The payment amount
  */
 export function processPayment(paymentId, amount) {
-  // Random delay between 3-5 seconds to simulate real processing
-  const delay = 3000 + Math.random() * 2000;
+  // Use configurable delay (defaults to 4000ms), plus up to 2s of random jitter
+  const delay = config.paymentProcessingDelay + Math.random() * 2000;
 
   console.log(`[Fake Provider] Processing payment ${paymentId}... (will take ${(delay / 1000).toFixed(1)}s)`);
 

@@ -33,7 +33,12 @@ import { initWebSocket } from './lib/websocket.js';
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  // Allow requests only from the frontend URL set in ALLOWED_ORIGIN env var.
+  // Falls back to localhost for local development.
+  origin: process.env.ALLOWED_ORIGIN || 'http://localhost:5173',
+  methods: ['GET', 'POST'],
+}));
 app.use(express.json());
 
 // Health check
