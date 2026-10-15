@@ -1,19 +1,15 @@
-﻿// StatusBadge.jsx — Color-coded payment status indicator
-// Shows a pill-shaped badge with different colors per status
+// StatusBadge.jsx — Payment status label
 
 export default function StatusBadge({ status }) {
-  const statusConfig = {
-    created:    { label: 'Created',    className: 'badge-created' },
-    processing: { label: 'Processing', className: 'badge-processing' },
-    captured:   { label: 'Captured',   className: 'badge-captured' },
-    failed:     { label: 'Failed',     className: 'badge-failed' },
+  const map = {
+    created:    { label: 'Created',    cls: 'badge-created'    },
+    processing: { label: 'Processing', cls: 'badge-processing' },
+    pending:    { label: 'Pending',    cls: 'badge-pending'    },
+    captured:   { label: 'Captured',   cls: 'badge-captured'   },
+    failed:     { label: 'Failed',     cls: 'badge-failed'     },
   };
 
-  const config = statusConfig[status] || { label: status, className: 'badge-default' };
+  const { label, cls } = map[status] || { label: status, cls: 'badge-created' };
 
-  return (
-    <span className={`status-badge ${config.className}`}>
-      {config.label}
-    </span>
-  );
+  return <span className={`badge ${cls}`}>{label}</span>;
 }
